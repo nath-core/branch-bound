@@ -20,10 +20,9 @@ export default function Navbar({ activeSection, scrollProgress }) {
     { id: 'prune', label: 'Prune' },
     { id: 'lc-search', label: 'LC Search' },
     { id: 'terminology', label: 'Terms' },
-    { id: 'simulation', label: 'Interactive Lab', highlight: true },
+    { id: 'simulation', label: 'Delivery Lab' },
+    { id: 'hospital-simulation', label: 'Hospital Lab', highlight: true },
     { id: 'algorithm', label: 'LC Search Algorithm' },
-    { id: 'code', label: 'Code' },
-    { id: 'revision', label: 'Revision' },
   ];
 
   const scrollTo = (id) => {

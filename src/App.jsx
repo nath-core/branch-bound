@@ -8,11 +8,8 @@ import PruningSection from './components/PruningSection';
 import LCSearchSection from './components/LCSearchSection';
 import TerminologySection from './components/TerminologySection';
 import DeliverySimulation from './components/DeliverySimulation';
+import HospitalSimulation from './components/HospitalSimulation';
 import AlgorithmSection from './components/AlgorithmSection';
-import CodeSection from './components/CodeSection';
-import ComparisonSection from './components/ComparisonSection';
-import MistakesSection from './components/MistakesSection';
-import SummarySection from './components/SummarySection';
 import ThankYou from './components/ThankYou';
 
 export default function App() {
@@ -43,11 +40,8 @@ export default function App() {
       'lc-search',
       'terminology',
       'simulation',
+      'hospital-simulation',
       'algorithm',
-      'code',
-      'comparison',
-      'mistakes',
-      'revision',
     ];
 
     const observer = new IntersectionObserver(
@@ -87,11 +81,8 @@ export default function App() {
         <LCSearchSection />
         <TerminologySection />
         <DeliverySimulation />
+        <HospitalSimulation />
         <AlgorithmSection />
-        <CodeSection />
-        <ComparisonSection />
-        <MistakesSection />
-        <SummarySection />
       </main>
 
       {/* Concluding Seminar Slide & Credits */}

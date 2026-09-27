@@ -1,7 +1,9 @@
 /**
- * Algorithm state machine data for Smart Delivery Planning
- * Following Section 17-20 & Section 36 of prompt.md:
- * States 0 through 9
+ * Algorithm state machine data for Smart Delivery Planning (Example 1)
+ * Following specs in replace_example_1_smart_delivery_planning.md:
+ * Route 1 (Hospital -> Mall -> Bus Terminal -> Tech Park) = 61 m
+ * Route 2 (Campus -> Library -> Tech Park) = 53 m (Optimal Best)
+ * Route 3 (Hospital -> Airport -> Cargo) = 56 m > 53 m (Pruned at Cargo before Tech Park)
  */
 
 export const SIMULATION_STEPS = [
@@ -20,69 +22,43 @@ export const SIMULATION_STEPS = [
     explanation: "At the start of Branch and Bound, the root problem is created and its lower bound is computed. It enters the live-node priority queue.",
     tree: {
       nodes: [
-        { id: "root", label: "Warehouse", bound: 10, x: 50, y: 15, status: "enode" }
+        { id: "root", label: "Warehouse", bound: 10, x: 100, y: 18, status: "enode" }
       ],
       edges: []
     }
   },
   {
     state: 1,
-    title: "Branching: First Step Decisions",
-    subtitle: "Branching to Immediate Deliveries",
+    title: "Branching: First Level Sector Selection",
+    subtitle: "Branching to Campus (18m) & Hospital (11m)",
     phase: "BRANCH",
-    description: "The root node is branched into two candidate delivery sectors: Route A (Campus) and Route B (Hospital). Subproblems are systematically divided.",
+    description: "Warehouse branches into two candidate delivery routes: Campus (18 m) and Hospital (11 m). Subproblems enter the priority queue.",
     currentBest: "∞ (None)",
     eNode: "Warehouse (Processed)",
     liveNodes: [
-      { id: "campus", name: "Campus", bound: 18, status: "live", path: "Warehouse → Campus", note: "Generated partial route" },
-      { id: "hospital", name: "Hospital", bound: 11, status: "live", path: "Warehouse → Hospital", note: "Generated partial route" }
+      { id: "hospital", name: "Hospital", bound: 11, status: "live", path: "Warehouse → Hospital", note: "Promising lower bound" },
+      { id: "campus", name: "Campus", bound: 18, status: "live", path: "Warehouse → Campus", note: "Candidate partial route" }
     ],
     prunedNodes: [],
-    explanation: "Branching divides the original dispatch problem into smaller subproblems by committing to the first stop.",
+    explanation: "Branching divides the dispatch problem into smaller subproblems by committing to the first stop.",
     tree: {
       nodes: [
-        { id: "root", label: "Warehouse", bound: 10, x: 50, y: 15, status: "dead" },
-        { id: "campus", label: "Campus", bound: 18, x: 30, y: 40, status: "live" },
-        { id: "hospital", label: "Hospital", bound: 11, x: 70, y: 40, status: "live" }
+        { id: "root", label: "Warehouse", bound: 10, x: 100, y: 18, status: "dead" },
+        { id: "campus", label: "Campus", bound: 18, x: 36, y: 75, status: "live" },
+        { id: "hospital", label: "Hospital", bound: 11, x: 136, y: 75, status: "live" }
       ],
       edges: [
-        { from: "root", to: "campus", label: "+18" },
-        { from: "root", to: "hospital", label: "+11" }
+        { from: "root", to: "campus", label: "18m" },
+        { from: "root", to: "hospital", label: "11m" }
       ]
     }
   },
   {
     state: 2,
-    title: "Calculate Bounds for Child Nodes",
-    subtitle: "Estimating Remaining Cost Potential",
-    phase: "BOUND",
-    description: "Admissible lower bounds are estimated: Campus is bounded at 18, while Hospital is bounded at 11. Remember: Bound ≠ Final Answer!",
-    currentBest: "∞ (None)",
-    eNode: "Selecting Next...",
-    liveNodes: [
-      { id: "hospital", name: "Hospital", bound: 11, status: "live", path: "Warehouse → Hospital", note: "Promising lower bound" },
-      { id: "campus", name: "Campus", bound: 18, status: "live", path: "Warehouse → Campus", note: "Higher bound estimate" }
-    ],
-    prunedNodes: [],
-    explanation: "The bound estimates how good a complete route can still become. Because 11 < 18, the Hospital route holds greater potential.",
-    tree: {
-      nodes: [
-        { id: "root", label: "Warehouse", bound: 10, x: 50, y: 15, status: "dead" },
-        { id: "campus", label: "Campus", bound: 18, x: 30, y: 40, status: "live" },
-        { id: "hospital", label: "Hospital", bound: 11, x: 70, y: 40, status: "live" }
-      ],
-      edges: [
-        { from: "root", to: "campus", label: "b=18" },
-        { from: "root", to: "hospital", label: "b=11" }
-      ]
-    }
-  },
-  {
-    state: 3,
-    title: "Live-Node Evaluation (Least-Cost Comparison)",
-    subtitle: "Min-Heap / Priority Queue Inspection",
+    title: "LC Selection: Hospital Branch Selected (11m)",
+    subtitle: "Min-Heap Priority Queue Inspection",
     phase: "LEAST-COST SELECTION",
-    description: "Live nodes are compared: Campus has bound 18, Hospital has bound 11. The Least-Cost Search rule dictates expanding the minimum bound first.",
+    description: "Live nodes are compared: Campus has bound 18 m, Hospital has bound 11 m. LC Search selects Hospital (11 m) as it has the minimum bound.",
     currentBest: "∞ (None)",
     eNode: "Hospital (Selected)",
     liveNodes: [
@@ -90,210 +66,190 @@ export const SIMULATION_STEPS = [
       { id: "campus", name: "Campus", bound: 18, status: "live", path: "Warehouse → Campus", note: "Remains in priority queue" }
     ],
     prunedNodes: [],
-    explanation: "LC (Least-Cost) Search selects the live node with the smallest bound (Hospital with bound 11) for immediate expansion.",
+    explanation: "LC (Least-Cost) Search selects the live node with the smallest bound (Hospital with 11 m) for immediate expansion.",
     tree: {
       nodes: [
-        { id: "root", label: "Warehouse", bound: 10, x: 50, y: 15, status: "dead" },
-        { id: "campus", label: "Campus", bound: 18, x: 30, y: 40, status: "live" },
-        { id: "hospital", label: "Hospital", bound: 11, x: 70, y: 40, status: "enode" }
+        { id: "root", label: "Warehouse", bound: 10, x: 100, y: 18, status: "dead" },
+        { id: "campus", label: "Campus", bound: 18, x: 36, y: 75, status: "live" },
+        { id: "hospital", label: "Hospital", bound: 11, x: 136, y: 75, status: "enode" }
       ],
       edges: [
-        { from: "root", to: "campus", label: "18" },
-        { from: "root", to: "hospital", label: "11 (Selected)", active: true }
+        { from: "root", to: "campus", label: "18m" },
+        { from: "root", to: "hospital", label: "11m", active: true }
+      ]
+    }
+  },
+  {
+    state: 3,
+    title: "First Complete Solution Discovered (61m)",
+    subtitle: "Route 1: Warehouse → Hospital → Mall → Bus Terminal → Tech Park",
+    phase: "FIRST SOLUTION",
+    description: "Expanding Hospital (11m) via Mall (+15m = 26m) and Bus Terminal (+20m = 46m) completes the first full route to Tech Park (+15m = 61m). Incumbent is set to 61 m!",
+    currentBest: "61 m (Route 1)",
+    eNode: "Tech Park (Complete)",
+    liveNodes: [
+      { id: "campus", name: "Campus", bound: 18, status: "live", path: "Warehouse → Campus", note: "Bound 18m < Current Best 61m" },
+      { id: "airport", name: "Airport", bound: 36, status: "live", path: "Hospital → Airport", note: "Bound 36m < Current Best 61m" }
+    ],
+    prunedNodes: [],
+    explanation: "Our first complete feasible route to Tech Park totals 61 m (11 + 15 + 20 + 15). This establishes our initial Current Best (Incumbent = 61 m).",
+    tree: {
+      nodes: [
+        { id: "root", label: "Warehouse", bound: 10, x: 100, y: 18, status: "dead" },
+        { id: "campus", label: "Campus", bound: 18, x: 36, y: 75, status: "live" },
+        { id: "hospital", label: "Hospital", bound: 11, x: 136, y: 75, status: "dead" },
+        { id: "mall", label: "Mall", bound: 26, x: 100, y: 135, status: "dead" },
+        { id: "bus_terminal", label: "Bus Terminal", bound: 46, x: 100, y: 195, status: "dead" },
+        { id: "techpark_mall", label: "Tech Park", bound: 61, x: 100, y: 255, status: "solution" }
+      ],
+      edges: [
+        { from: "root", to: "campus", label: "18m" },
+        { from: "root", to: "hospital", label: "11m" },
+        { from: "hospital", to: "mall", label: "15m" },
+        { from: "mall", to: "bus_terminal", label: "20m" },
+        { from: "bus_terminal", to: "techpark_mall", label: "Cost=61m ✓", active: true }
       ]
     }
   },
   {
     state: 4,
-    title: "E-Node Expansion: Branching Hospital",
-    subtitle: "Hospital Becomes Active E-Node",
-    phase: "EXPANSION",
-    description: "Hospital is extracted from the live queue and becomes the E-node (Expansion Node). It branches into Mall (bound 14) and Airport (bound 30).",
-    currentBest: "∞ (None)",
-    eNode: "Hospital (Expanding)",
+    title: "Next LC Selection: Campus Branch (18m < 61m)",
+    subtitle: "Exploring Remaining Promising Live Node",
+    phase: "LEAST-COST SELECTION",
+    description: "The live nodes are Campus (bound 18m) and Airport (bound 36m). Campus has the smaller bound (18 < 36 < 61) and is selected as the next E-node.",
+    currentBest: "61 m (Route 1)",
+    eNode: "Campus (Selected)",
     liveNodes: [
-      { id: "mall", name: "Mall", bound: 14, status: "live", path: "Hospital → Mall", note: "Child node generated" },
-      { id: "campus", name: "Campus", bound: 18, status: "live", path: "Warehouse → Campus", note: "Live in queue" },
-      { id: "airport", name: "Airport", bound: 30, status: "live", path: "Hospital → Airport", note: "Child node generated" }
+      { id: "campus", name: "Campus", bound: 18, status: "selected", path: "Warehouse → Campus", note: "Minimum bound (18m)" },
+      { id: "airport", name: "Airport", bound: 36, status: "live", path: "Hospital → Airport", note: "Live node (36m)" }
     ],
     prunedNodes: [],
-    explanation: "Hospital is now dead (processed). Its newly generated children 'Mall' and 'Airport' enter the live list alongside 'Campus'.",
+    explanation: "Finding a 61 m solution does not stop the search! Campus is live with cost 18 m < 61 m, so it must be expanded.",
     tree: {
       nodes: [
-        { id: "root", label: "Warehouse", bound: 10, x: 50, y: 15, status: "dead" },
-        { id: "campus", label: "Campus", bound: 18, x: 30, y: 40, status: "live" },
-        { id: "hospital", label: "Hospital", bound: 11, x: 70, y: 40, status: "dead" },
-        { id: "mall", label: "Mall", bound: 14, x: 60, y: 65, status: "live" },
-        { id: "airport", label: "Airport", bound: 30, x: 85, y: 65, status: "live" }
+        { id: "root", label: "Warehouse", bound: 10, x: 100, y: 18, status: "dead" },
+        { id: "campus", label: "Campus", bound: 18, x: 36, y: 75, status: "enode" },
+        { id: "hospital", label: "Hospital", bound: 11, x: 136, y: 75, status: "dead" },
+        { id: "mall", label: "Mall", bound: 26, x: 100, y: 135, status: "dead" },
+        { id: "bus_terminal", label: "Bus Terminal", bound: 46, x: 100, y: 195, status: "dead" },
+        { id: "techpark_mall", label: "Tech Park", bound: 61, x: 100, y: 255, status: "solution" }
       ],
       edges: [
-        { from: "root", to: "campus", label: "18" },
-        { from: "root", to: "hospital", label: "11" },
-        { from: "hospital", to: "mall", label: "+3 (b=14)" },
-        { from: "hospital", to: "airport", label: "+19 (b=30)" }
+        { from: "root", to: "campus", label: "18m", active: true },
+        { from: "root", to: "hospital", label: "11m" },
+        { from: "hospital", to: "mall", label: "15m" },
+        { from: "mall", to: "bus_terminal", label: "20m" },
+        { from: "bus_terminal", to: "techpark_mall", label: "61m" }
       ]
     }
   },
   {
     state: 5,
-    title: "Select Next E-Node: Mall (Bound = 14)",
-    subtitle: "LC Chooses Smallest Across All Live Branches",
-    phase: "LEAST-COST SELECTION",
-    description: "The live nodes are Mall (14), Campus (18), and Airport (30). Notice that Mall has the least cost (14 < 18 < 30). Mall is selected as the next E-node.",
-    currentBest: "∞ (None)",
-    eNode: "Mall (Selected)",
+    title: "Optimal Solution Found (53m)",
+    subtitle: "Route 2: Warehouse → Campus → Library → Tech Park",
+    phase: "NEW INCUMBENT",
+    description: "Expanding Campus (18m) via Library (+20m = 38m) reaches Tech Park (+15m = 53m). Since 53 m < 61 m, the Current Best updates to 53 m!",
+    currentBest: "53 m (Route 2)",
+    eNode: "Tech Park (Optimal Solution)",
     liveNodes: [
-      { id: "mall", name: "Mall", bound: 14, status: "selected", path: "Hospital → Mall", note: "Least cost (14)" },
-      { id: "campus", name: "Campus", bound: 18, status: "live", path: "Warehouse → Campus", note: "Live node (18)" },
-      { id: "airport", name: "Airport", bound: 30, status: "live", path: "Hospital → Airport", note: "Live node (30)" }
+      { id: "airport", name: "Airport", bound: 36, status: "live", path: "Hospital → Airport", note: "Bound 36m < Current Best 53m" }
     ],
     prunedNodes: [],
-    explanation: "LC Search does not greedily stick to one path if another branch has lower cost; here Mall is the globally minimum live node.",
+    explanation: "This route is shorter! 18 + 20 + 15 = 53 m. The current best solution updates from 61 m to 53 m.",
     tree: {
       nodes: [
-        { id: "root", label: "Warehouse", bound: 10, x: 50, y: 15, status: "dead" },
-        { id: "campus", label: "Campus", bound: 18, x: 30, y: 40, status: "live" },
-        { id: "hospital", label: "Hospital", bound: 11, x: 70, y: 40, status: "dead" },
-        { id: "mall", label: "Mall", bound: 14, x: 60, y: 65, status: "enode" },
-        { id: "airport", label: "Airport", bound: 30, x: 85, y: 65, status: "live" }
+        { id: "root", label: "Warehouse", bound: 10, x: 100, y: 18, status: "dead" },
+        { id: "campus", label: "Campus", bound: 18, x: 36, y: 75, status: "dead" },
+        { id: "library", label: "Library", bound: 38, x: 36, y: 135, status: "dead" },
+        { id: "techpark_campus", label: "Tech Park", bound: 53, x: 36, y: 195, status: "solution" },
+        { id: "hospital", label: "Hospital", bound: 11, x: 136, y: 75, status: "dead" },
+        { id: "mall", label: "Mall", bound: 26, x: 100, y: 135, status: "dead" },
+        { id: "bus_terminal", label: "Bus Terminal", bound: 46, x: 100, y: 195, status: "dead" },
+        { id: "techpark_mall", label: "Tech Park", bound: 61, x: 100, y: 255, status: "dead" }
       ],
       edges: [
-        { from: "root", to: "campus", label: "18" },
-        { from: "root", to: "hospital", label: "11" },
-        { from: "hospital", to: "mall", label: "14", active: true },
-        { from: "hospital", to: "airport", label: "30" }
+        { from: "root", to: "campus", label: "18m" },
+        { from: "campus", to: "library", label: "20m" },
+        { from: "library", to: "techpark_campus", label: "Cost=53m ★", active: true },
+        { from: "root", to: "hospital", label: "11m" },
+        { from: "hospital", to: "mall", label: "15m" },
+        { from: "mall", to: "bus_terminal", label: "20m" },
+        { from: "bus_terminal", to: "techpark_mall", label: "61m" }
       ]
     }
   },
   {
     state: 6,
-    title: "Feasible Solution Found: Cost = 20",
-    subtitle: "Incumbent / Current Best Established",
-    phase: "SOLUTION DISCOVERY",
-    description: "Mall branches to complete the route via Tech Park. This yields the first complete feasible solution with exact Cost = 20. Incumbent is set to 20!",
-    currentBest: "20 (Route: W→H→M→Tech)",
-    eNode: "Tech Park (Complete)",
-    liveNodes: [
-      { id: "campus", name: "Campus", bound: 18, status: "live", path: "Warehouse → Campus", note: "Bound 18 < Current Best 20" },
-      { id: "airport", name: "Airport", bound: 30, status: "live", path: "Hospital → Airport", note: "Bound 30 ≥ Current Best 20" }
+    title: "Early Pruning at Cargo (56m > 53m)",
+    subtitle: "Airport Branch Exceeds Current Best — Discarded!",
+    phase: "EARLY PRUNING",
+    description: "Expanding Hospital → Airport (11m + 25m = 36m) → Cargo (+20m = 56m). At Cargo, current cost is 56 m. Since 56 m > 53 m, this branch is PRUNED immediately! The final edge Cargo → Tech Park (15m) is never traversed.",
+    currentBest: "53 m (Route 2)",
+    eNode: "Pruning Cargo Node",
+    liveNodes: [],
+    prunedNodes: [
+      { id: "cargo", name: "Cargo Node", bound: 56, reason: "Cost (56m) > Current Best (53m)" }
     ],
-    prunedNodes: [],
-    explanation: "A complete solution of cost 20 has been found. Any live or future node with bound ≥ 20 can never beat this solution and must be pruned!",
+    explanation: "Because 56 m > 53 m, this branch cannot beat our best route of 53 m. Since edge distances are non-negative, we PRUNE immediately at Cargo without reaching Tech Park!",
     tree: {
       nodes: [
-        { id: "root", label: "Warehouse", bound: 10, x: 50, y: 15, status: "dead" },
-        { id: "campus", label: "Campus", bound: 18, x: 30, y: 40, status: "live" },
-        { id: "hospital", label: "Hospital", bound: 11, x: 70, y: 40, status: "dead" },
-        { id: "mall", label: "Mall", bound: 14, x: 60, y: 65, status: "dead" },
-        { id: "airport", label: "Airport", bound: 30, x: 85, y: 65, status: "live" },
-        { id: "techpark", label: "Tech Park", bound: 20, x: 60, y: 88, status: "solution" }
+        { id: "root", label: "Warehouse", bound: 10, x: 100, y: 18, status: "dead" },
+        { id: "campus", label: "Campus", bound: 18, x: 36, y: 75, status: "dead" },
+        { id: "library", label: "Library", bound: 38, x: 36, y: 135, status: "dead" },
+        { id: "techpark_campus", label: "Tech Park", bound: 53, x: 36, y: 195, status: "solution" },
+        { id: "hospital", label: "Hospital", bound: 11, x: 136, y: 75, status: "dead" },
+        { id: "airport", label: "Airport", bound: 36, x: 172, y: 135, status: "dead" },
+        { id: "cargo", label: "Cargo", bound: 56, x: 172, y: 195, status: "pruned" },
+        { id: "techpark_cargo", label: "Tech Park", bound: 71, x: 172, y: 255, status: "unvisited" }
       ],
       edges: [
-        { from: "root", to: "campus", label: "18" },
-        { from: "root", to: "hospital", label: "11" },
-        { from: "hospital", to: "mall", label: "14" },
-        { from: "hospital", to: "airport", label: "30" },
-        { from: "mall", to: "techpark", label: "Cost=20 ✓", active: true }
+        { from: "root", to: "campus", label: "18m" },
+        { from: "campus", to: "library", label: "20m" },
+        { from: "library", to: "techpark_campus", label: "53m" },
+        { from: "root", to: "hospital", label: "11m" },
+        { from: "hospital", to: "airport", label: "25m" },
+        { from: "airport", to: "cargo", label: "20m (PRUNED)", pruned: true },
+        { from: "cargo", to: "techpark_cargo", label: "15m", unvisited: true }
       ]
     }
   },
   {
     state: 7,
-    title: "Pruning: Bound ≥ Current Best (30 ≥ 20)",
-    subtitle: "Eliminating Non-Promising Subproblems",
-    phase: "PRUNING",
-    description: "Airport has bound 30. Since 30 ≥ 20 (Current Best), Airport cannot possibly contain a route better than 20. Airport is PRUNED immediately!",
-    currentBest: "20 (Route: W→H→M→Tech)",
-    eNode: "Pruning Airport Node",
-    liveNodes: [
-      { id: "campus", name: "Campus", bound: 18, status: "live", path: "Warehouse → Campus", note: "18 < 20 (Kept live)" }
-    ],
-    prunedNodes: [
-      { id: "airport", name: "Airport", bound: 30, reason: "Bound (30) ≥ Current Best (20)" }
-    ],
-    explanation: "Pruning eliminates entire subtrees without exploring them. We save significant time and computational power by discarding the Airport branch.",
-    tree: {
-      nodes: [
-        { id: "root", label: "Warehouse", bound: 10, x: 50, y: 15, status: "dead" },
-        { id: "campus", label: "Campus", bound: 18, x: 30, y: 40, status: "live" },
-        { id: "hospital", label: "Hospital", bound: 11, x: 70, y: 40, status: "dead" },
-        { id: "mall", label: "Mall", bound: 14, x: 60, y: 65, status: "dead" },
-        { id: "airport", label: "Airport", bound: 30, x: 85, y: 65, status: "pruned" },
-        { id: "techpark", label: "Tech Park", bound: 20, x: 60, y: 88, status: "solution" }
-      ],
-      edges: [
-        { from: "root", to: "campus", label: "18" },
-        { from: "root", to: "hospital", label: "11" },
-        { from: "hospital", to: "mall", label: "14" },
-        { from: "hospital", to: "airport", label: "30 (PRUNED)", pruned: true },
-        { from: "mall", to: "techpark", label: "Cost=20 ✓" }
-      ]
-    }
-  },
-  {
-    state: 8,
-    title: "Next LC Selection: Campus (Bound = 18)",
-    subtitle: "Exploring Remaining Live Node",
-    phase: "LEAST-COST SELECTION",
-    description: "The only live node is Campus (bound 18). Since 18 < 20, it is still potentially better than our current best solution. Campus is chosen as E-node.",
-    currentBest: "20 (Route: W→H→M→Tech)",
-    eNode: "Campus (Selected)",
-    liveNodes: [
-      { id: "campus", name: "Campus", bound: 18, status: "selected", path: "Warehouse → Campus", note: "18 < 20, must be investigated" }
-    ],
-    prunedNodes: [
-      { id: "airport", name: "Airport", bound: 30, reason: "Bound (30) ≥ Current Best (20)" }
-    ],
-    explanation: "Because the bound is an optimistic estimate, Campus could theoretically lead to an 18-cost route. Therefore, it must be expanded.",
-    tree: {
-      nodes: [
-        { id: "root", label: "Warehouse", bound: 10, x: 50, y: 15, status: "dead" },
-        { id: "campus", label: "Campus", bound: 18, x: 30, y: 40, status: "enode" },
-        { id: "hospital", label: "Hospital", bound: 11, x: 70, y: 40, status: "dead" },
-        { id: "mall", label: "Mall", bound: 14, x: 60, y: 65, status: "dead" },
-        { id: "airport", label: "Airport", bound: 30, x: 85, y: 65, status: "pruned" },
-        { id: "techpark", label: "Tech Park", bound: 20, x: 60, y: 88, status: "solution" }
-      ],
-      edges: [
-        { from: "root", to: "campus", label: "18 (Selected)", active: true },
-        { from: "root", to: "hospital", label: "11" },
-        { from: "hospital", to: "mall", label: "14" },
-        { from: "hospital", to: "airport", label: "30", pruned: true },
-        { from: "mall", to: "techpark", label: "Cost=20 ✓" }
-      ]
-    }
-  },
-  {
-    state: 9,
-    title: "Termination: Global Optimal Solution Verified",
-    subtitle: "Optimal Delivery Route Confirmed (Cost = 20)",
+    title: "Termination: Global Optimal Solution Confirmed (53m)",
+    subtitle: "Warehouse → Campus → Library → Tech Park",
     phase: "TERMINATION",
-    description: "Campus branches into final deliveries, yielding actual cost = 22. Since 22 ≥ 20, this branch is pruned! Live queue is now empty. The algorithm halts.",
-    currentBest: "20 (GLOBAL OPTIMUM)",
+    description: "All subproblems have either been fully expanded or pruned! The route Warehouse → Campus → Library → Tech Park (Cost: 53 m) is GUARANTEED optimal!",
+    currentBest: "53 m (GLOBAL OPTIMUM)",
     eNode: "None (Search Complete)",
     liveNodes: [],
     prunedNodes: [
-      { id: "airport", name: "Airport", bound: 30, reason: "Bound (30) ≥ Current Best (20)" },
-      { id: "campus_end", name: "Campus Subroute", bound: 22, reason: "Cost (22) ≥ Current Best (20)" }
+      { id: "cargo", name: "Cargo Node", bound: 56, reason: "Cost (56m) > Current Best (53m)" }
     ],
-    explanation: "All subproblems have either been expanded or mathematically proven sub-optimal and pruned. The route Warehouse → Hospital → Mall → Tech Park (Cost: 20) is GUARANTEED optimal!",
+    explanation: "Search complete! First route (61m) was replaced by the Campus route (53m), and the Airport branch was pruned at Cargo (56m > 53m) before completing.",
     tree: {
       nodes: [
-        { id: "root", label: "Warehouse", bound: 10, x: 50, y: 15, status: "optimal" },
-        { id: "campus", label: "Campus", bound: 18, x: 30, y: 40, status: "dead" },
-        { id: "campus_sub", label: "End Route", bound: 22, x: 25, y: 65, status: "pruned" },
-        { id: "hospital", label: "Hospital", bound: 11, x: 70, y: 40, status: "optimal" },
-        { id: "mall", label: "Mall", bound: 14, x: 60, y: 65, status: "optimal" },
-        { id: "airport", label: "Airport", bound: 30, x: 85, y: 65, status: "pruned" },
-        { id: "techpark", label: "Tech Park", bound: 20, x: 60, y: 88, status: "optimal" }
+        { id: "root", label: "Warehouse", bound: 10, x: 100, y: 18, status: "optimal" },
+        { id: "campus", label: "Campus", bound: 18, x: 36, y: 75, status: "optimal" },
+        { id: "library", label: "Library", bound: 38, x: 36, y: 135, status: "optimal" },
+        { id: "techpark_campus", label: "Tech Park", bound: 53, x: 36, y: 195, status: "optimal" },
+        { id: "hospital", label: "Hospital", bound: 11, x: 136, y: 75, status: "dead" },
+        { id: "mall", label: "Mall", bound: 26, x: 100, y: 135, status: "dead" },
+        { id: "bus_terminal", label: "Bus Terminal", bound: 46, x: 100, y: 195, status: "dead" },
+        { id: "techpark_mall", label: "Tech Park", bound: 61, x: 100, y: 255, status: "dead" },
+        { id: "airport", label: "Airport", bound: 36, x: 172, y: 135, status: "dead" },
+        { id: "cargo", label: "Cargo", bound: 56, x: 172, y: 195, status: "pruned" }
       ],
       edges: [
-        { from: "root", to: "campus", label: "18" },
-        { from: "campus", to: "campus_sub", label: "22", pruned: true },
-        { from: "root", to: "hospital", label: "11", optimal: true },
-        { from: "hospital", to: "mall", label: "14", optimal: true },
-        { from: "hospital", to: "airport", label: "30", pruned: true },
-        { from: "mall", to: "techpark", label: "Optimal (20)", optimal: true }
+        { from: "root", to: "campus", label: "18m", optimal: true },
+        { from: "campus", to: "library", label: "20m", optimal: true },
+        { from: "library", to: "techpark_campus", label: "Optimal (53m)", optimal: true },
+        { from: "root", to: "hospital", label: "11m" },
+        { from: "hospital", to: "mall", label: "15m" },
+        { from: "mall", to: "bus_terminal", label: "20m" },
+        { from: "bus_terminal", to: "techpark_mall", label: "61m" },
+        { from: "hospital", to: "airport", label: "25m" },
+        { from: "airport", to: "cargo", label: "20m", pruned: true },
+        { from: "cargo", to: "techpark_cargo", label: "15m", unvisited: true }
       ]
     }
   }
@@ -341,60 +297,5 @@ export const TERMINOLOGY_ITEMS = [
     color: "green",
     tag: "Benchmark",
     definition: "The best complete feasible solution discovered so far. It acts as the upper cutoff threshold for all pruning decisions."
-  }
-];
-
-export const COMPARISON_DATA = [
-  {
-    method: "Depth-First Search (DFS)",
-    strategy: "Go deep into the tree first along a single path",
-    queueType: "LIFO Stack",
-    expansionOrder: "Deepest unvisited live node",
-    optimizationSuitability: "May wander deep down terrible paths before finding a solution",
-    badge: "Stack-based"
-  },
-  {
-    method: "Breadth-First Search (BFS / FIFO)",
-    strategy: "Explore all nodes level by level uniformly",
-    queueType: "FIFO Queue",
-    expansionOrder: "Shallowest unvisited live node",
-    optimizationSuitability: "Explores all shallow subproblems regardless of their cost or promise",
-    badge: "Queue-based"
-  },
-  {
-    method: "Least-Cost (LC) Search",
-    strategy: "Prioritize the most promising subproblem across the entire frontier",
-    queueType: "Min-Heap / Priority Queue",
-    expansionOrder: "Live node having the minimum cost / bound",
-    optimizationSuitability: "Directs exploration directly toward the optimal solution, enabling early aggressive pruning",
-    badge: "Priority Queue",
-    highlight: true
-  }
-];
-
-export const COMMON_MISTAKES = [
-  {
-    id: 1,
-    mistake: "“The bound is the final answer.”",
-    correction: "The bound is strictly an estimate or limit on the best possible solution reachable from a partial state. It is used to judge node potential and decide pruning, not as the final solution.",
-    whyItMatters: "Thinking the bound is the answer confuses an optimistic lower bound with a completed feasible solution."
-  },
-  {
-    id: 2,
-    mistake: "“LC Search means the lowest final solution found so far.”",
-    correction: "LC (Least-Cost) Search defines the selection rule for expanding live nodes. It picks the live node with the minimum bound. The 'current best' is called the Incumbent.",
-    whyItMatters: "Conflating the selection policy with the global optimum hides how LC guides the search frontier."
-  },
-  {
-    id: 3,
-    mistake: "“Every generated node in the tree must eventually be explored.”",
-    correction: "The core power of Branch and Bound is pruning! Any node whose bound is greater than or equal to the current best feasible solution is permanently discarded without expanding its subtree.",
-    whyItMatters: "Without pruning, Branch and Bound would devolve into brute-force exhaustive enumeration."
-  },
-  {
-    id: 4,
-    mistake: "“Branch & Bound and Backtracking are exactly the same technique.”",
-    correction: "While both search a state-space tree, Backtracking is typically DFS-based and guided by feasibility constraints (e.g., N-Queens). Branch and Bound specifically addresses optimization problems using bounding functions to prune non-optimal branches.",
-    whyItMatters: "KTU university exams frequently test the exact conceptual boundary between Backtracking and Branch & Bound."
   }
 ];
