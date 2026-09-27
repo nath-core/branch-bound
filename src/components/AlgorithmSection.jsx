@@ -6,7 +6,6 @@ export default function AlgorithmSection() {
   const [activeStep, setActiveStep] = useState(2);
 
   const algorithmCode = `FUNCTION LC_Branch_And_Bound(root):
-
     liveNodes = NEW PriorityQueue()
 
     root.bound = CALCULATE_BOUND(root)
@@ -16,28 +15,20 @@ export default function AlgorithmSection() {
     bestCost = INFINITY
 
     WHILE liveNodes IS NOT EMPTY:
-
         currentNode = liveNodes.pop_least_cost()
 
         IF currentNode.bound >= bestCost:
             CONTINUE
 
         IF currentNode IS A COMPLETE FEASIBLE SOLUTION:
-
             currentCost = COST(currentNode)
-
             IF currentCost < bestCost:
                 bestCost = currentCost
                 bestSolution = currentNode
-
         ELSE:
-
             children = BRANCH(currentNode)
-
             FOR EACH child IN children:
-
                 child.bound = CALCULATE_BOUND(child)
-
                 IF child.bound < bestCost:
                     liveNodes.insert(child)
 

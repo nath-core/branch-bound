@@ -15,8 +15,8 @@ export default function HospitalGraphVisualizer({ stepData, graphData }) {
   const getNode = (id) => graphData.nodes.find((n) => n.id === id);
 
   return (
-    <div className="relative w-full aspect-[650/660] flex items-center justify-center p-2 bg-black/60 rounded-2xl border border-white/10 overflow-hidden shadow-inner">
-      <svg viewBox="0 0 200 245" className="w-full h-full overflow-visible select-none">
+    <div className="relative w-full aspect-[240/175] flex items-center justify-center p-2 bg-black/60 rounded-2xl border border-white/10 overflow-hidden shadow-inner">
+      <svg viewBox="0 0 240 175" className="w-full h-full select-none">
         
         <defs>
           <linearGradient id="optGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -98,17 +98,17 @@ export default function HospitalGraphVisualizer({ stepData, graphData }) {
               <g transform={`translate(${midX}, ${midY})`}>
                 <rect
                   x="-10.5"
-                  y="-4.8"
+                  y="-4.5"
                   width="21.0"
-                  height="9.6"
-                  rx="2.2"
+                  height="9.0"
+                  rx="2.0"
                   fill="#060608"
                   stroke={stroke}
                   strokeWidth="0.8"
                   opacity={isUnexplored ? 0.75 : 0.98}
                 />
                 <text
-                  y="1.8"
+                  y="1.6"
                   fill={
                     isOptimal ? '#34c759' : 
                     isPruned ? '#ff4d4f' : 
@@ -116,7 +116,7 @@ export default function HospitalGraphVisualizer({ stepData, graphData }) {
                     isUnexplored ? 'rgba(255,120,120,0.85)' :
                     '#ffffff'
                   }
-                  fontSize="5.0"
+                  fontSize="4.8"
                   fontFamily="monospace"
                   fontWeight="bold"
                   textAnchor="middle"
@@ -127,9 +127,9 @@ export default function HospitalGraphVisualizer({ stepData, graphData }) {
 
               {/* Unexplored marker on Ward-C -> Lab edge */}
               {isUnexplored && (
-                <g transform={`translate(${midX + 15}, ${midY + 1})`}>
-                  <rect x="-1" y="-4.0" width="30" height="7.5" rx="1.8" fill="#2a090b" stroke="#ff3b30" strokeWidth="0.7" />
-                  <text y="1.2" fill="#ff453a" fontSize="3.8" fontFamily="monospace" fontWeight="bold">
+                <g transform={`translate(${midX - 18}, ${midY + 8})`}>
+                  <rect x="-1" y="-3.8" width="30" height="7.2" rx="1.6" fill="#2a090b" stroke="#ff3b30" strokeWidth="0.7" />
+                  <text y="1.2" fill="#ff453a" fontSize="3.6" fontFamily="monospace" fontWeight="bold">
                     UNEXPLORED
                   </text>
                 </g>
@@ -179,7 +179,7 @@ export default function HospitalGraphVisualizer({ stepData, graphData }) {
               {/* Pulse animation for selected node */}
               {isSelected && (
                 <circle
-                  r="9.0"
+                  r="8.5"
                   fill="none"
                   stroke="#60a5fa"
                   strokeWidth="1.0"
@@ -190,7 +190,7 @@ export default function HospitalGraphVisualizer({ stepData, graphData }) {
 
               {/* Node Circle */}
               <circle
-                r="6.0"
+                r="5.5"
                 fill={fill}
                 stroke={stroke}
                 strokeWidth={strokeWidth}
@@ -199,17 +199,17 @@ export default function HospitalGraphVisualizer({ stepData, graphData }) {
 
               {/* Node Icon / Symbol inside */}
               {node.id === 'hospital' && (
-                <text y="2.0" fontSize="4.8" textAnchor="middle">🏥</text>
+                <text y="1.8" fontSize="4.4" textAnchor="middle">🏥</text>
               )}
               {node.type === 'lab' && (
-                <text y="2.0" fontSize="4.4" textAnchor="middle">🔬</text>
+                <text y="1.8" fontSize="4.0" textAnchor="middle">🔬</text>
               )}
 
-              {/* Label ABOVE node circle with generous clearance */}
+              {/* Label ABOVE node circle */}
               <text
-                y="-9.5"
+                y="-8.5"
                 fill={isPruned ? '#ff4d4f' : isSelected ? '#93c5fd' : isMainLab ? '#34c759' : textFill}
-                fontSize="5.6"
+                fontSize="5.2"
                 fontWeight="800"
                 fontFamily="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif"
                 textAnchor="middle"
@@ -219,9 +219,9 @@ export default function HospitalGraphVisualizer({ stepData, graphData }) {
 
               {/* Subtitle / Note BELOW node circle */}
               <text
-                y="13.5"
+                y="12.0"
                 fill={isPruned ? '#f87171' : 'rgba(255, 255, 255, 0.85)'}
-                fontSize="4.4"
+                fontSize="4.0"
                 fontFamily="monospace"
                 fontWeight="bold"
                 textAnchor="middle"
@@ -231,18 +231,18 @@ export default function HospitalGraphVisualizer({ stepData, graphData }) {
 
               {/* Status Badges BELOW subtitle */}
               {isPruned && (
-                <g transform="translate(0, 20.5)">
-                  <rect x="-10.0" y="-3.2" width="20.0" height="6.4" rx="1.4" fill="#ff3b30" />
-                  <text y="1.5" fill="#ffffff" fontSize="3.8" fontWeight="bold" fontFamily="monospace" textAnchor="middle">
+                <g transform="translate(0, 18.0)">
+                  <rect x="-9.5" y="-3.0" width="19.0" height="6.0" rx="1.3" fill="#ff3b30" />
+                  <text y="1.4" fill="#ffffff" fontSize="3.6" fontWeight="bold" fontFamily="monospace" textAnchor="middle">
                     ✕ PRUNED
                   </text>
                 </g>
               )}
 
               {isSelected && (
-                <g transform="translate(0, 20.5)">
-                  <rect x="-9.5" y="-3.2" width="19.0" height="6.4" rx="1.4" fill="#0071e3" />
-                  <text y="1.5" fill="#ffffff" fontSize="3.8" fontWeight="bold" fontFamily="monospace" textAnchor="middle">
+                <g transform="translate(0, 18.0)">
+                  <rect x="-9.0" y="-3.0" width="18.0" height="6.0" rx="1.3" fill="#0071e3" />
+                  <text y="1.4" fill="#ffffff" fontSize="3.6" fontWeight="bold" fontFamily="monospace" textAnchor="middle">
                     E-NODE
                   </text>
                 </g>

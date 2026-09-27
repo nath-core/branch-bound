@@ -178,26 +178,26 @@ export const HOSPITAL_STEPS = [
 
 export const HOSPITAL_GRAPH = {
   nodes: [
-    { id: "hospital", label: "Hospital", sub: "Start", x: 97, y: 18, type: "start" },
+    { id: "hospital", label: "Hospital", sub: "Start", x: 136, y: 16, type: "start" },
     
     // Level 1
-    { id: "icu_1", label: "ICU", sub: "20m", x: 34, y: 75, type: "level1" },
-    { id: "emergency", label: "Emergency", sub: "25m", x: 106, y: 75, type: "level1" },
-    { id: "pharmacy_1", label: "Pharmacy", sub: "30m", x: 160, y: 75, type: "level1" },
+    { id: "icu_1", label: "ICU", sub: "20m", x: 46.5, y: 56, type: "level1" },
+    { id: "emergency", label: "Emergency", sub: "25m", x: 144.5, y: 56, type: "level1" },
+    { id: "pharmacy_1", label: "Pharmacy", sub: "30m", x: 218, y: 56, type: "level1" },
 
     // Level 2
-    { id: "ward_a", label: "Ward-A", sub: "+25m", x: 16, y: 135, type: "level2" },
-    { id: "ward_b", label: "Ward-B", sub: "+30m", x: 52, y: 135, type: "level2" },
-    { id: "icu_2", label: "ICU", sub: "+20m", x: 88, y: 135, type: "level2" },
-    { id: "pharmacy_2", label: "Pharmacy", sub: "+30m", x: 124, y: 135, type: "level2" },
-    { id: "ward_c", label: "Ward-C", sub: "+35m", x: 160, y: 135, type: "level2" },
+    { id: "ward_a", label: "Ward-A", sub: "+25m", x: 22, y: 96, type: "level2" },
+    { id: "ward_b", label: "Ward-B", sub: "+30m", x: 71, y: 96, type: "level2" },
+    { id: "icu_2", label: "ICU", sub: "+20m", x: 120, y: 96, type: "level2" },
+    { id: "pharmacy_2", label: "Pharmacy", sub: "+30m", x: 169, y: 96, type: "level2" },
+    { id: "ward_c", label: "Ward-C", sub: "+35m", x: 218, y: 96, type: "level2" },
 
     // Level 3 (Laboratories)
-    { id: "lab_a", label: "Laboratory", sub: "+25m", x: 16, y: 195, type: "lab" },
-    { id: "lab_b", label: "Laboratory", sub: "+20m", x: 52, y: 195, type: "lab" },
-    { id: "lab_icu", label: "Laboratory", sub: "+15m", x: 88, y: 195, type: "lab" },
-    { id: "lab_pharm", label: "Laboratory", sub: "+10m", x: 124, y: 195, type: "lab" },
-    { id: "lab_c", label: "Laboratory", sub: "Unexplored", x: 160, y: 195, type: "lab" }
+    { id: "lab_a", label: "Laboratory", sub: "+25m", x: 22, y: 136, type: "lab" },
+    { id: "lab_b", label: "Laboratory", sub: "+20m", x: 71, y: 136, type: "lab" },
+    { id: "lab_icu", label: "Laboratory", sub: "+15m", x: 120, y: 136, type: "lab" },
+    { id: "lab_pharm", label: "Laboratory", sub: "+10m", x: 169, y: 136, type: "lab" },
+    { id: "lab_c", label: "Laboratory", sub: "Unexplored", x: 218, y: 136, type: "lab" }
   ],
   edges: [
     { id: "h-icu1", from: "hospital", to: "icu_1", label: "20m" },
